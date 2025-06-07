@@ -1,8 +1,9 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, Plus, Minus, Trash2, Eye, Edit, Package, Users, DollarSign, Star } from 'lucide-react';
-
+import { useAuth } from './context/AuthContext.jsx'; // Import useAuth
 // Context for global state management
-export const AppContext = createContext(); // Export AppContext
+export const AppContext = createContext(); 
 
 // Mock API functions (replace with real API calls)
 const API = {
@@ -91,11 +92,11 @@ const mockUsers = [
 ];
 
 const mockProducts = [
-  { id: 1, name: 'Balaclava Hoodie', brand: 'Balaclava', price: 400, image: '/api/placeholder/300/300', inventory: 15, category: 'Hoodies' },
-  { id: 2, name: 'Streetwear Hoodie', brand: 'Damnationdesign', price: 450, image: '/api/placeholder/300/300', inventory: 8, category: 'Hoodies' },
-  { id: 3, name: 'Balaclava T-Shirt', brand: 'Balaclava', price: 250, image: '/api/placeholder/300/300', inventory: 20, category: 'T-Shirts' },
-  { id: 4, name: 'Street Tee', brand: 'Galbakaline', price: 280, image: '/api/placeholder/300/300', inventory: 12, category: 'T-Shirts' },
-  { id: 5, name: 'Kasi Bucket Hat', brand: 'Umelu', price: 150, image: '/api/placeholder/300/300', inventory: 25, category: 'Accessories' }
+  { id: 1, name: 'Balaclava Hoodie', brand: 'Balaclava', price: 400, image: '/src/assets/IMG-20250221-WA0011.jpg', inventory: 15, category: 'Hoodies' },
+  { id: 2, name: 'Streetwear Hoodie', brand: 'Damnationdesign', price: 450, image: '/src/assets/IMG-20250221-WA0012.jpg', inventory: 8, category: 'Hoodies' },
+  { id: 3, name: 'Balaclava T-Shirt', brand: 'Balaclava', price: 250, image: '/src/assets/IMG-20250221-WA0013.jpg', inventory: 20, category: 'T-Shirts' },
+  { id: 4, name: 'Street Tee', brand: 'Galbakaline', price: 280, image: '/src/assets/IMG-20250221-WA0014.jpg', inventory: 12, category: 'T-Shirts' },
+  { id: 5, name: 'Kasi Bucket Hat', brand: 'Umelu', price: 150, image: '/src/assets/WhatsApp Image 2025-02-21 at 15.58.44_f129d0b8.jpg', inventory: 25, category: 'Accessories' }
 ];
 
 const mockOrders = [];
@@ -112,18 +113,18 @@ import RegisterPage from './components/RegisterPage.jsx';
 import CartPage from './components/CartPage.jsx';
 import CheckoutPage from './components/CheckoutPage.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
 // import EditProductModal from './components/EditProductModal.jsx';
 // import AddProductModal from './components/AddProductModal.jsx';
 
 
 // Main App Component
 function App() {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth(); // Use user from AuthContext
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState('home'); // Added currentPage state
 
   useEffect(() => {
     loadProducts();
@@ -177,12 +178,12 @@ function App() {
   };
 
   const contextValue = {
-    user, setUser,
+    user, // No setUser here, as AuthContext manages it
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, getTotalPrice,
     products, setProducts, loadProducts,
     loading, setLoading,
     searchTerm, setSearchTerm,
-    currentPage, setCurrentPage // Added setCurrentPage to context
+    API, // Add API to context
   };
 
   return (
@@ -190,15 +191,26 @@ function App() {
       <div className="min-h-screen bg-gray-900 text-white">
         <Header />
         <main className="pb-20">
-          {currentPage === 'home' && <HomePage />}
-          {currentPage === 'shop' && <ShopPage />}
-          {currentPage === 'about' && <AboutPage />}
-          {currentPage === 'contact' && <ContactPage />}
-          {currentPage === 'cart' && <CartPage />}
-          {currentPage === 'login' && <LoginPage />}
-          {currentPage === 'register' && <RegisterPage />}
-          {currentPage === 'checkout' && <CheckoutPage />}
-          {currentPage === 'admin' && user?.role === 'admin' && <AdminDashboard />}
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/shop" element={<ShopPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            {/* Add a catch-all route for 404 or redirect to home */}
+            <Route path="*" element={<HomePage />} />
+          </Routes>
         </main>
       </div>
     </AppContext.Provider>

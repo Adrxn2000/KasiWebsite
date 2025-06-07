@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { AppContext } from '../App.jsx'; // Assuming AppContext is exported from App.jsx
+import { AppContext } from '../App.jsx'; 
+
 
 function ProductCard({ product }) {
   const { addToCart, user } = useContext(AppContext);

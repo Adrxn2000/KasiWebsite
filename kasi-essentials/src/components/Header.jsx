@@ -1,32 +1,31 @@
 import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
-import { AppContext } from '../App.jsx'; // Assuming AppContext is exported from App.jsx
+import { AppContext } from '../App.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 
 function Header() {
-  const { user, setUser, cart, currentPage, setCurrentPage, searchTerm, setSearchTerm, loadProducts } = useContext(AppContext);
+  const { cart, searchTerm, setSearchTerm, loadProducts } = useContext(AppContext);
+  const { isLoggedIn, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    setCurrentPage('shop');
+    navigate('/shop');
     await loadProducts();
-  };
-
-  const logout = () => {
-    setUser(null);
-    setCurrentPage('home');
   };
 
   return (
     <header className="bg-white text-black shadow-lg relative z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <h1 
-            className="text-3xl font-bold cursor-pointer"
-            onClick={() => setCurrentPage('home')}
-          >
-            BlackFabrics
-          </h1>
+         <h1 
+  className="text-3xl font-bold cursor-pointer font-['20db']"
+  onClick={() => navigate('/')}
+>
+  BlackFabrics
+</h1>
 
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-8">
@@ -46,13 +45,13 @@ function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <button onClick={() => setCurrentPage('home')} className="hover:text-orange-500">Home</button>
-            <button onClick={() => setCurrentPage('shop')} className="hover:text-orange-500">Shop</button>
-            <button onClick={() => setCurrentPage('about')} className="hover:text-orange-500">About</button>
-            <button onClick={() => setCurrentPage('contact')} className="hover:text-orange-500">Contact</button>
+            <Link to="/" className="hover:text-orange-500">Home</Link>
+            <Link to="/shop" className="hover:text-orange-500">Shop</Link>
+            <Link to="/about" className="hover:text-orange-500">About</Link>
+            <Link to="/contact" className="hover:text-orange-500">Contact</Link>
             
-            <button
-              onClick={() => setCurrentPage('cart')}
+            <Link
+              to="/cart"
               className="relative hover:text-orange-500"
             >
               <ShoppingCart size={24} />
@@ -61,22 +60,22 @@ function Header() {
                   {cart.reduce((sum, item) => sum + item.quantity, 0)}
                 </span>
               )}
-            </button>
+            </Link>
 
-            {user ? (
+            {isLoggedIn ? (
               <div className="flex items-center space-x-2">
-                <span>Hi, {user.name}</span>
-                {user.role === 'admin' && (
-                  <button onClick={() => setCurrentPage('admin')} className="text-orange-500 hover:underline">
+                <span>Hi, {user?.name || user?.email}</span>
+                {user?.role === 'admin' && (
+                  <Link to="/admin" className="text-orange-500 hover:underline">
                     Admin
-                  </button>
+                  </Link>
                 )}
-                <button onClick={logout} className="text-red-500 hover:underline">Logout</button>
+                <button onClick={() => { logout(); navigate('/'); }} className="text-red-500 hover:underline">Logout</button>
               </div>
             ) : (
-              <button onClick={() => setCurrentPage('login')} className="hover:text-orange-500">
+              <Link to="/login" className="hover:text-orange-500">
                 <User size={24} />
-              </button>
+              </Link>
             )}
           </nav>
 
@@ -107,25 +106,25 @@ function Header() {
               </div>
             </form>
             <nav className="space-y-2">
-              <button onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }} className="block w-full text-left py-2">Home</button>
-              <button onClick={() => { setCurrentPage('shop'); setIsMenuOpen(false); }} className="block w-full text-left py-2">Shop</button>
-              <button onClick={() => { setCurrentPage('about'); setIsMenuOpen(false); }} className="block w-full text-left py-2">About</button>
-              <button onClick={() => { setCurrentPage('contact'); setIsMenuOpen(false); }} className="block w-full text-left py-2">Contact</button>
-              <button onClick={() => { setCurrentPage('cart'); setIsMenuOpen(false); }} className="block w-full text-left py-2">
+              <Link to="/" onClick={() => setIsMenuOpen(false)} className="block w-full text-left py-2">Home</Link>
+              <Link to="/shop" onClick={() => setIsMenuOpen(false)} className="block w-full text-left py-2">Shop</Link>
+              <Link to="/about" onClick={() => setIsMenuOpen(false)} className="block w-full text-left py-2">About</Link>
+              <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="block w-full text-left py-2">Contact</Link>
+              <Link to="/cart" onClick={() => setIsMenuOpen(false)} className="block w-full text-left py-2">
                 Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})
-              </button>
-              {user ? (
+              </Link>
+              {isLoggedIn ? (
                 <>
-                  <div className="py-2">Hi, {user.name}</div>
-                  {user.role === 'admin' && (
-                    <button onClick={() => { setCurrentPage('admin'); setIsMenuOpen(false); }} className="block w-full text-left py-2 text-orange-500">
+                  <div className="py-2">Hi, {user?.name || user?.email}</div>
+                  {user?.role === 'admin' && (
+                    <Link to="/admin" onClick={() => setIsMenuOpen(false)} className="block w-full text-left py-2 text-orange-500">
                       Admin Panel
-                    </button>
+                    </Link>
                   )}
-                  <button onClick={() => { logout(); setIsMenuOpen(false); }} className="block w-full text-left py-2 text-red-500">Logout</button>
+                  <button onClick={() => { logout(); setIsMenuOpen(false); navigate('/'); }} className="block w-full text-left py-2 text-red-500">Logout</button>
                 </>
               ) : (
-                <button onClick={() => { setCurrentPage('login'); setIsMenuOpen(false); }} className="block w-full text-left py-2">Login</button>
+                <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block w-full text-left py-2">Login</Link>
               )}
             </nav>
           </div>

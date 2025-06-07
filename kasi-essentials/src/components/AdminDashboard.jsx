@@ -1,19 +1,13 @@
-// import React { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { AppContext } from '../App.jsx'; // Assuming AppContext is exported from App.jsx
 import EditProductModal from './EditProductModal.jsx'; // Assuming EditProductModal will be in components
 import AddProductModal from './AddProductModal.jsx'; // Assuming AddProductModal will be in components
 
 function AdminDashboard() {
-  const { user, products, loadProducts, setCurrentPage } = useContext(AppContext);
+  const { user, products, loadProducts, API } = useContext(AppContext);
   const [editingProduct, setEditingProduct] = useState(null);
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (user?.role !== 'admin') {
-      setCurrentPage('home');
-    }
-  }, [user, setCurrentPage]);
 
   const handleEditClick = (product) => {
     setEditingProduct(product);

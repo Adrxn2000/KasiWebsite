@@ -1,17 +1,21 @@
 import React, { useContext } from 'react';
 import { Plus, Minus, Trash2 } from 'lucide-react';
-import { AppContext } from '../App.jsx'; // Assuming AppContext is exported from App.jsx
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import { AppContext } from '../App.jsx'; // Keep AppContext for cart state
 
 function CartPage() {
-  const { cart, updateCartQuantity, removeFromCart, getTotalPrice, user, setCurrentPage } = useContext(AppContext);
+  const { cart, updateCartQuantity, removeFromCart, getTotalPrice } = useContext(AppContext);
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
 
-  if (!user) {
+  if (!isLoggedIn) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
         <p className="text-xl mb-8">Please login to view your cart</p>
         <button
-          onClick={() => setCurrentPage('login')}
+          onClick={() => navigate('/login')}
           className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600"
         >
           Login
@@ -26,7 +30,7 @@ function CartPage() {
         <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
         <p className="text-xl mb-8">Your cart is empty</p>
         <button
-          onClick={() => setCurrentPage('shop')}
+          onClick={() => navigate('/shop')}
           className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600"
         >
           Continue Shopping
@@ -82,7 +86,7 @@ function CartPage() {
           <span>R{getTotalPrice().toFixed(2)}</span>
         </div>
         <button
-          onClick={() => setCurrentPage('checkout')}
+          onClick={() => navigate('/checkout')}
           className="w-full bg-orange-500 text-white py-3 rounded-lg font-bold text-lg hover:bg-orange-600 transition-colors"
         >
           Proceed to Checkout

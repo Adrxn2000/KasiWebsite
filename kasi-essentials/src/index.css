@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+@font-face {
+    font-family: '20db';
+    src: url('./assets/20_db/20db.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}

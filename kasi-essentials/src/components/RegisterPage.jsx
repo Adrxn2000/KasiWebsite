@@ -1,8 +1,8 @@
-import React, { useState, useContext } from 'react';
-import { AppContext } from '../App.jsx'; // Assuming AppContext is exported from App.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 
 function RegisterPage() {
-  const { setUser, setCurrentPage } = useContext(AppContext);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -11,6 +11,8 @@ function RegisterPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,13 +26,10 @@ function RegisterPage() {
     setIsLoading(true);
     
     try {
-      const { user, token } = await API.register({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password
-      });
-      setUser(user);
-      setCurrentPage('home');
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      register({ name: formData.name, email: formData.email, role: 'user' });
+      navigate('/shop'); // Redirect to shop page after registration
     } catch (err) {
       setError(err.message);
     }
@@ -102,7 +101,7 @@ function RegisterPage() {
         <div className="text-center mt-6">
           <p className="text-gray-400">Already have an account?</p>
           <button
-            onClick={() => setCurrentPage('login')}
+            onClick={() => navigate('/login')}
             className="text-orange-500 hover:underline font-bold"
           >
             Login here

@@ -1,11 +1,13 @@
-import React, { useState, useContext } from 'react';
-import { AppContext } from '../App.jsx'; // Assuming AppContext is exported from App.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 
 function LoginPage() {
-  const { setUser, setCurrentPage } = useContext(AppContext);
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,9 +15,19 @@ function LoginPage() {
     setError('');
     
     try {
-      const { user, token } = await API.login(formData.email, formData.password);
-      setUser(user);
-      setCurrentPage('home');
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000)); 
+      console.log('Attempting login with:', formData.email, formData.password); // Debug log
+      if (formData.email === 'user@example.com' && formData.password === 'user123') {
+        login({ email: formData.email, role: 'user' });
+        navigate('/shop'); // Redirect to shop page after login
+      } else if (formData.email === 'admin@blackfabrics.com' && formData.password === 'admin123') {
+        login({ email: formData.email, role: 'admin' });
+        navigate('/admin'); // Redirect to admin dashboard for admin
+      }
+      else {
+        throw new Error('Invalid credentials');
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -67,10 +79,10 @@ function LoginPage() {
         <div className="text-center mt-6">
           <p className="text-gray-400">Don't have an account?</p>
           <button
-            onClick={() => setCurrentPage('register')}
+            onClick={() => navigate('/register')}
             className="text-orange-500 hover:underline font-bold"
           >
-            Login here
+            Register here
           </button>
         </div>
         
