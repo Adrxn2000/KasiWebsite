@@ -1,106 +1,162 @@
-import React, { useState } from 'react';
-import { AppContext } from '../App.jsx'; // Assuming AppContext is exported from App.jsx
+import React, { useState, useContext } from 'react';
+import { X } from 'lucide-react';
+import { AppContext } from '../App.jsx';
 
 function EditProductModal({ product, onClose, onSave }) {
-  const [formData, setFormData] = useState(product);
+  const { API } = useContext(AppContext);
+  const [formData, setFormData] = useState({
+    name: product.name,
+    brand: product.brand,
+    price: product.price,
+    image: product.image,
+    inventory: product.inventory,
+    description: product.description || ''
+  });
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: name === 'price' || name === 'inventory' ? Number(value) : value }));
-  };
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
+
     try {
-      // Assuming API is available globally or passed via context/props
-      await API.updateProduct(product.id, formData);
+      // Update product in localStorage
+      const products = JSON.parse(localStorage.getItem('products') || '[]');
+      const updatedProducts = products.map(p => 
+        p.id === product.id 
+          ? { ...p, ...formData, price: parseFloat(formData.price), inventory: parseInt(formData.inventory) }
+          : p
+      );
+      localStorage.setItem('products', JSON.stringify(updatedProducts));
+
+      // If you have an API, uncomment this line:
+      // await API.updateProduct(product.id, formData);
+      
       onSave();
-    } catch (error) {
-      alert('Failed to update product: ' + error.message);
+    } catch (err) {
+      setError(err.message || 'Failed to update product');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Edit Product</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">Edit Product</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-500 text-white p-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-300 text-sm font-bold mb-2">Name</label>
+            <label className="block text-sm font-medium mb-2">Product Name</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:border-orange-500 focus:outline-none"
               required
+              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
             />
           </div>
+
           <div>
-            <label className="block text-gray-300 text-sm font-bold mb-2">Brand</label>
+            <label className="block text-sm font-medium mb-2">Brand</label>
             <input
               type="text"
               name="brand"
               value={formData.brand}
               onChange={handleChange}
-              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:border-orange-500 focus:outline-none"
               required
+              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
             />
           </div>
+
           <div>
-            <label className="block text-gray-300 text-sm font-bold mb-2">Price</label>
+            <label className="block text-sm font-medium mb-2">Price (R)</label>
             <input
               type="number"
               name="price"
               value={formData.price}
               onChange={handleChange}
-              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:border-orange-500 focus:outline-none"
               required
               min="0"
               step="0.01"
+              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
             />
           </div>
+
           <div>
-            <label className="block text-gray-300 text-sm font-bold mb-2">Inventory</label>
-            <input
-              type="number"
-              name="inventory"
-              value={formData.inventory}
-              onChange={handleChange}
-              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:border-orange-500 focus:outline-none"
-              required
-              min="0"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-300 text-sm font-bold mb-2">Image URL</label>
+            <label className="block text-sm font-medium mb-2">Image URL</label>
             <input
               type="text"
               name="image"
               value={formData.image}
               onChange={handleChange}
-              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:border-orange-500 focus:outline-none"
               required
+              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
             />
           </div>
-          <div className="flex justify-end space-x-4 mt-6">
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Inventory</label>
+            <input
+              type="number"
+              name="inventory"
+              value={formData.inventory}
+              onChange={handleChange}
+              required
+              min="0"
+              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows="3"
+              className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="flex gap-4 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="flex-1 bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-5 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 transition-colors"
+              className="flex-1 bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 disabled:opacity-50 transition-colors"
             >
-              {isLoading ? 'Saving...' : 'Save Changes'}
+              {isLoading ? 'Updating...' : 'Update Product'}
             </button>
           </div>
         </form>

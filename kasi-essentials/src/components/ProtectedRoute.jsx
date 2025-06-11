@@ -13,7 +13,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }, [isLoggedIn, user, requiredRole, navigate]);
 
   if (!isLoggedIn || (requiredRole && user?.role !== requiredRole)) {
-    return null; // Or a loading spinner, or a message
+    return null; 
   }
 
   return children;

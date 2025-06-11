@@ -11,25 +11,70 @@ function RegisterPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
     
+    // Basic password validation
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
+      // Check if user already exists in localStorage
+      const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      const userExists = existingUsers.some(user => user.email === formData.email);
+      
+      if (userExists) {
+        throw new Error('User with this email already exists');
+      }
+      
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Save user to localStorage
+      const newUser = {
+        id: Date.now().toString(),
+        name: formData.name,
+        email: formData.email,
+        password: formData.password, // In production, this should be hashed
+        role: 'user',
+        registeredAt: new Date().toISOString()
+      };
+      
+      const updatedUsers = [...existingUsers, newUser];
+      localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+      
+      // Also save current user session
+      localStorage.setItem('currentUser', JSON.stringify({
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role
+      }));
+      
+      setSuccess('Registration successful! Redirecting...');
+      
+      // Register user in auth context
       register({ name: formData.name, email: formData.email, role: 'user' });
-      navigate('/shop'); // Redirect to shop page after registration
+      
+      // Redirect after showing success message
+      setTimeout(() => {
+        navigate('/shop');
+      }, 1500);
+      
     } catch (err) {
       setError(err.message);
     }
@@ -45,6 +90,12 @@ function RegisterPage() {
         {error && (
           <div className="bg-red-500 text-white p-3 rounded mb-4 text-center">
             {error}
+          </div>
+        )}
+        
+        {success && (
+          <div className="bg-green-500 text-white p-3 rounded mb-4 text-center">
+            {success}
           </div>
         )}
         
@@ -72,10 +123,11 @@ function RegisterPage() {
           <div>
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Password (min 6 characters)"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
               required
+              minLength="6"
               className="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
             />
           </div>
@@ -106,6 +158,10 @@ function RegisterPage() {
           >
             Login here
           </button>
+        </div>
+        
+        <div className="text-center mt-4 text-xs text-gray-500">
+          <p>Users are stored locally in your browser</p>
         </div>
       </div>
     </div>

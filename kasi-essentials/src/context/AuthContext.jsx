@@ -9,21 +9,21 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     setIsLoggedIn(true);
     setUser(userData);
-    // In a real application, you would handle API calls for login here
+    
     console.log('User logged in:', userData);
   };
 
   const logout = () => {
     setIsLoggedIn(false);
     setUser(null);
-    // In a real application, you would handle API calls for logout here
+    
     console.log('User logged out');
   };
 
   const register = (userData) => {
-    // In a real application, you would handle API calls for registration here
+
     console.log('User registered:', userData);
-    // For simplicity, auto-login after registration
+
     login(userData);
   };
 

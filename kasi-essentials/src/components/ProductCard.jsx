@@ -18,7 +18,7 @@ function ProductCard({ product }) {
       <img
         src={product.image}
         alt={product.name}
-        className="w-full h-64 object-cover"
+        className="w-full h-84 object-cover"
       />
       <div className="p-4">
         <div className="text-sm text-gray-600 mb-1">{product.brand}</div>
@@ -30,7 +30,7 @@ function ProductCard({ product }) {
         <button
           onClick={handleAddToCart}
           disabled={product.inventory === 0}
-          className={`w-full py-2 rounded-lg font-bold transition-colors ${
+          className={`w-full py-2 rounded-lg pd- font-bold transition-colors ${
             product.inventory === 0
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-orange-500 text-white hover:bg-orange-600'

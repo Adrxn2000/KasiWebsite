@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -6,8 +6,21 @@ function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Load saved credentials on component mount
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem('savedLoginCredentials');
+    if (savedCredentials) {
+      const { email, password, remember } = JSON.parse(savedCredentials);
+      if (remember) {
+        setFormData({ email, password });
+        setRememberMe(true);
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,15 +28,61 @@ function LoginPage() {
     setError('');
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000)); 
-      console.log('Attempting login with:', formData.email, formData.password); // Debug log
-      if (formData.email === 'user@example.com' && formData.password === 'user123') {
+      console.log('Attempting login with:', formData.email, formData.password);
+      
+      // Check against registered users first
+      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      const user = registeredUsers.find(u => u.email === formData.email && u.password === formData.password);
+
+      if (user) {
+        // Login with registered user
+        login({ name: user.name, email: user.email, role: user.role });
+        
+        // Save credentials if remember me is checked
+        if (rememberMe) {
+          localStorage.setItem('savedLoginCredentials', JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            remember: true
+          }));
+        } else {
+          localStorage.removeItem('savedLoginCredentials');
+        }
+        
+        navigate(user.role === 'admin' ? '/admin' : '/shop');
+      } 
+      // Keep your original demo login logic for empty fields
+      else if (formData.email === '' && formData.password === '') {
         login({ email: formData.email, role: 'user' });
-        navigate('/shop'); // Redirect to shop page after login
-      } else if (formData.email === 'admin@blackfabrics.com' && formData.password === 'admin123') {
+        
+        if (rememberMe) {
+          localStorage.setItem('savedLoginCredentials', JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            remember: true
+          }));
+        } else {
+          localStorage.removeItem('savedLoginCredentials');
+        }
+        
+        navigate('/shop');
+      } 
+      // Keep your original admin login
+      else if (formData.email === 'admin@blackfabrics.com' && formData.password === 'admin123') {
         login({ email: formData.email, role: 'admin' });
-        navigate('/admin'); // Redirect to admin dashboard for admin
+        
+        if (rememberMe) {
+          localStorage.setItem('savedLoginCredentials', JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            remember: true
+          }));
+        } else {
+          localStorage.removeItem('savedLoginCredentials');
+        }
+        
+        navigate('/admin'); 
       }
       else {
         throw new Error('Invalid credentials');
@@ -67,6 +126,20 @@ function LoginPage() {
               className="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
             />
           </div>
+          
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="mr-2 w-4 h-4 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500"
+            />
+            <label htmlFor="rememberMe" className="text-gray-300">
+              Remember my credentials
+            </label>
+          </div>
+          
           <button
             type="submit"
             disabled={isLoading}
@@ -89,7 +162,7 @@ function LoginPage() {
         <div className="text-center mt-4 text-sm text-gray-400">
           <p>Demo accounts:</p>
           <p>Admin: admin@blackfabrics.com / admin123</p>
-          <p>User: user@example.com / user123</p>
+          <p>User: (empty fields) or register new account</p>
         </div>
       </div>
     </div>
