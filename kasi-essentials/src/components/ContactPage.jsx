@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppContext } from '../App.jsx'; // Assuming AppContext is exported from App.jsx
+import { AppContext } from '../App.jsx'; 
 
 function ContactPage() {
   const [formData, setFormData] = useState({
@@ -12,7 +12,6 @@ function ContactPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 1000));
     alert('Message sent successfully!');
     setFormData({ name: '', email: '', message: '' });

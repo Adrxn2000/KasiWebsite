@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AppContext } from '../App.jsx'; // Assuming AppContext is exported from App.jsx
+import { AppContext } from '../App.jsx'; 
 
 function CheckoutPage() {
   const { cart, getTotalPrice, clearCart, user, setCurrentPage } = useContext(AppContext);
@@ -19,14 +19,12 @@ function CheckoutPage() {
     setIsLoading(true);
     setError('');
     try {
-      // Simulate order creation
       const order = await API.createOrder({
         userId: user.id,
         items: cart.map(item => ({ productId: item.id, quantity: item.quantity, price: item.price })),
         total: getTotalPrice()
       });
-      
-      // Simulate payment processing
+      console.log('Order created:', order);
       await API.processPayment();
 
       clearCart();
@@ -39,7 +37,7 @@ function CheckoutPage() {
   };
 
   if (!user || (cart.length === 0 && !orderPlaced)) {
-    return null; // Redirect handled by useEffect
+    return null; 
   }
 
   if (orderPlaced) {
@@ -83,7 +81,6 @@ function CheckoutPage() {
 
       <div className="bg-gray-800 rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold mb-4">Payment Information</h2>
-        {/* In a real app, this would be a payment form */}
         <p className="text-gray-400 mb-6">
           Payment processing is simulated. Click "Place Order" to complete your purchase.
         </p>

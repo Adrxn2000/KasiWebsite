@@ -10,7 +10,7 @@ function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Load saved credentials on component mount
+
   useEffect(() => {
     const savedCredentials = localStorage.getItem('savedLoginCredentials');
     if (savedCredentials) {
@@ -31,15 +31,12 @@ function LoginPage() {
       await new Promise(resolve => setTimeout(resolve, 1000)); 
       console.log('Attempting login with:', formData.email, formData.password);
       
-      // Check against registered users first
       const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
       const user = registeredUsers.find(u => u.email === formData.email && u.password === formData.password);
 
       if (user) {
-        // Login with registered user
         login({ name: user.name, email: user.email, role: user.role });
         
-        // Save credentials if remember me is checked
         if (rememberMe) {
           localStorage.setItem('savedLoginCredentials', JSON.stringify({
             email: formData.email,
@@ -51,8 +48,7 @@ function LoginPage() {
         }
         
         navigate(user.role === 'admin' ? '/admin' : '/shop');
-      } 
-      // Keep your original demo login logic for empty fields
+      }
       else if (formData.email === '' && formData.password === '') {
         login({ email: formData.email, role: 'user' });
         
@@ -68,7 +64,6 @@ function LoginPage() {
         
         navigate('/shop');
       } 
-      // Keep your original admin login
       else if (formData.email === 'admin@blackfabrics.com' && formData.password === 'admin123') {
         login({ email: formData.email, role: 'admin' });
         

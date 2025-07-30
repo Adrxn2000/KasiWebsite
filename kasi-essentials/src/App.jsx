@@ -100,8 +100,6 @@ const mockProducts = [
 ];
 
 const mockOrders = [];
-
-// Import components
 import Header from './components/Header.jsx';
 import HomePage from './components/HomePage.jsx';
 import ShopPage from './components/ShopPage.jsx';
@@ -117,10 +115,8 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 // import EditProductModal from './components/EditProductModal.jsx';
 // import AddProductModal from './components/AddProductModal.jsx';
 
-
-// Main App Component
 function App() {
-  const { user } = useAuth(); // Use user from AuthContext
+  const { user } = useAuth(); 
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -178,12 +174,12 @@ function App() {
   };
 
   const contextValue = {
-    user, // No setUser here, as AuthContext manages it
+    user,
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, getTotalPrice,
     products, setProducts, loadProducts,
     loading, setLoading,
     searchTerm, setSearchTerm,
-    API, // Add API to context
+    API, 
   };
 
   return (
@@ -208,7 +204,7 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            {/* Add a catch-all route for 404 or redirect to home */}
+
             <Route path="*" element={<HomePage />} />
           </Routes>
         </main>

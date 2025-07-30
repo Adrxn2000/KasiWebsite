@@ -21,7 +21,6 @@ function EditProductModal({ product, onClose, onSave }) {
     setError('');
 
     try {
-      // Update product in localStorage
       const products = JSON.parse(localStorage.getItem('products') || '[]');
       const updatedProducts = products.map(p => 
         p.id === product.id 
@@ -29,10 +28,6 @@ function EditProductModal({ product, onClose, onSave }) {
           : p
       );
       localStorage.setItem('products', JSON.stringify(updatedProducts));
-
-      // If you have an API, uncomment this line:
-      // await API.updateProduct(product.id, formData);
-      
       onSave();
     } catch (err) {
       setError(err.message || 'Failed to update product');

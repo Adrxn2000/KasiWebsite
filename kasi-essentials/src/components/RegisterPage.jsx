@@ -25,7 +25,6 @@ function RegisterPage() {
       return;
     }
     
-    // Basic password validation
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
       return;
@@ -34,23 +33,20 @@ function RegisterPage() {
     setIsLoading(true);
     
     try {
-      // Check if user already exists in localStorage
       const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
       const userExists = existingUsers.some(user => user.email === formData.email);
       
       if (userExists) {
         throw new Error('User with this email already exists');
       }
-      
-      // Simulate API call
+    
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Save user to localStorage
+    
       const newUser = {
         id: Date.now().toString(),
         name: formData.name,
         email: formData.email,
-        password: formData.password, // In production, this should be hashed
+        password: formData.password,
         role: 'user',
         registeredAt: new Date().toISOString()
       };
@@ -58,7 +54,7 @@ function RegisterPage() {
       const updatedUsers = [...existingUsers, newUser];
       localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
       
-      // Also save current user session
+      
       localStorage.setItem('currentUser', JSON.stringify({
         name: newUser.name,
         email: newUser.email,
@@ -66,11 +62,9 @@ function RegisterPage() {
       }));
       
       setSuccess('Registration successful! Redirecting...');
-      
-      // Register user in auth context
+
       register({ name: formData.name, email: formData.email, role: 'user' });
-      
-      // Redirect after showing success message
+    
       setTimeout(() => {
         navigate('/shop');
       }, 1500);
