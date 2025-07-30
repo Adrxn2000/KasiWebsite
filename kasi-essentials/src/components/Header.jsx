@@ -24,7 +24,7 @@ function Header() {
   className="text-3xl font-bold cursor-pointer font-['20db']"
   onClick={() => navigate('/')}
 >
-  BlackFabrics
+  Kasi Essentials
 </h1>
 
           {/* Search Bar */}
