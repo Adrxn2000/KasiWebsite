@@ -26,7 +26,10 @@ function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    
+
+    const email = formData.email.trim();
+    const password = formData.password.trim();
+
     try {
       await new Promise(resolve => setTimeout(resolve, 1000)); 
       console.log('Attempting login with:', formData.email, formData.password);
@@ -84,57 +87,48 @@ function LoginPage() {
       }
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-md mx-auto bg-gray-800 p-8 rounded-lg">
         <h1 className="text-3xl font-bold text-center mb-8">Login</h1>
-        
+
         {error && (
           <div className="bg-red-500 text-white p-3 rounded mb-4 text-center">
             {error}
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <input
               type="email"
               placeholder="Email"
               value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               required
               className="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
             />
           </div>
+
           <div>
             <input
               type="password"
               placeholder="Password"
               value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
               required
               className="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
             />
           </div>
-          
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="rememberMe"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="mr-2 w-4 h-4 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500"
-            />
-            <label htmlFor="rememberMe" className="text-gray-300">
-              Remember my credentials
-            </label>
-          </div>
-          
           <button
             type="submit"
             disabled={isLoading}
@@ -143,7 +137,7 @@ function LoginPage() {
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        
+
         <div className="text-center mt-6">
           <p className="text-gray-400">Don't have an account?</p>
           <button
@@ -153,7 +147,7 @@ function LoginPage() {
             Register here
           </button>
         </div>
-        
+
         <div className="text-center mt-4 text-sm text-gray-400">
           <p>Demo accounts:</p>
           <p>Admin: admin@blackfabrics.com / admin123</p>

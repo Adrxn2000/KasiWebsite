@@ -13,7 +13,7 @@ function AdminDashboard() {
     setEditingProduct(product);
   };
 
-  const handleDelete = async (productId) => {
+  const handleDelete = async ( productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         // Delete from localStorage
