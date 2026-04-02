@@ -3,27 +3,30 @@ import React, { createContext, useState, useContext } from 'react';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  // Initialize from localStorage so session persists on refresh
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('currentUser');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Derived — no separate isLoggedIn state needed
+  const isLoggedIn = !!user;
 
   const login = (userData) => {
-    setIsLoggedIn(true);
     setUser(userData);
-    
-    console.log('User logged in:', userData);
+    localStorage.setItem('currentUser', JSON.stringify(userData));
   };
 
   const logout = () => {
-    setIsLoggedIn(false);
     setUser(null);
-    
-    console.log('User logged out');
+    localStorage.removeItem('currentUser');
   };
 
   const register = (userData) => {
-
-    console.log('User registered:', userData);
-
     login(userData);
   };
 
@@ -34,6 +37,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
