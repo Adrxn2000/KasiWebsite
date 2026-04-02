@@ -93,11 +93,11 @@ const mockUsers = [
 ];
 
 const mockProducts = [
-  { id: 1, name: 'Balaclava Hoodie', brand: 'Balaclava', price: 400, image: '/src/assets/IMG-20250221-WA0011.jpg', inventory: 15, category: 'Hoodies' },
-  { id: 2, name: 'Streetwear Hoodie', brand: 'Damnationdesign', price: 450, image: '/src/assets/IMG-20250221-WA0012.jpg', inventory: 8, category: 'Hoodies' },
-  { id: 3, name: 'Balaclava T-Shirt', brand: 'Balaclava', price: 250, image: '/src/assets/IMG-20250221-WA0013.jpg', inventory: 20, category: 'T-Shirts' },
-  { id: 4, name: 'Street Tee', brand: 'Galbakaline', price: 280, image: '/src/assets/IMG-20250221-WA0014.jpg', inventory: 12, category: 'T-Shirts' },
-  { id: 5, name: 'Kasi Bucket Hat', brand: 'Umelu', price: 150, image: '/src/assets/WhatsApp Image 2025-02-21 at 15.58.44_f129d0b8.jpg', inventory: 25, category: 'Accessories' }
+  { id: 1, name: 'Balaclava Hoodie', brand: 'Balaclava', price: 400, image: '/images/IMG-20250221-WA0011.jpg', inventory: 15, category: 'Hoodies' },
+  { id: 2, name: 'Streetwear Hoodie', brand: 'Damnationdesign', price: 450, image: '/images/IMG-20250221-WA0012.jpg', inventory: 8, category: 'Hoodies' },
+  { id: 3, name: 'Balaclava T-Shirt', brand: 'Balaclava', price: 250, image: '/images/IMG-20250221-WA0013.jpg', inventory: 20, category: 'T-Shirts' },
+  { id: 4, name: 'Street Tee', brand: 'Galbakaline', price: 280, image: '/images/IMG-20250221-WA0014.jpg', inventory: 12, category: 'T-Shirts' },
+  { id: 5, name: 'Kasi Bucket Hat', brand: 'Umelu', price: 150, image: '/images/WhatsApp Image 2025-02-21 at 15.58.44_f129d0b8.jpg', inventory: 25, category: 'Accessories' }
 ];
 
 const mockOrders = [];
