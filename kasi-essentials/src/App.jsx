@@ -2,6 +2,7 @@ import React, { useState, useEffect, createContext } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, Plus, Minus, Trash2, Eye, Edit, Package, Users, DollarSign, Star } from 'lucide-react';
 import { useAuth } from './context/AuthContext.jsx'; // Import useAuth
+
 // Context for global state management
 export const AppContext = createContext(); 
 
@@ -112,12 +113,26 @@ import CartPage from './components/CartPage.jsx';
 import CheckoutPage from './components/CheckoutPage.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import WishlistPage from './components/Wishlistpage.jsx';
+import ProductDetailPage from './components/Productdetailpage.jsx';
 // import EditProductModal from './components/EditProductModal.jsx';
 // import AddProductModal from './components/AddProductModal.jsx';
 
 function App() {
   const { user } = useAuth(); 
   const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+
+  const addToWishlist = (product) => {
+  setWishlist(prev => {
+    const exists = prev.find(item => item.id === product.id);
+    if (exists) return prev.filter(item => item.id !== product.id); // toggle off
+    return [...prev, product];
+  });
+};
+
+const isWishlisted = (productId) => wishlist.some(item => item.id === productId);
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -126,16 +141,23 @@ function App() {
     loadProducts();
   }, []);
 
-  const loadProducts = async () => {
-    setLoading(true);
-    try {
-      const data = await API.getProducts();
-      setProducts(data);
-    } catch (error) {
-      console.error('Failed to load products:', error);
-    }
-    setLoading(false);
-  };
+const loadProducts = async () => {
+  setLoading(true);
+  try {
+    const localProducts = JSON.parse(localStorage.getItem('products') || '[]');
+    const apiData = await API.getProducts(searchTerm);
+    // Merge: local products take priority, then mock products not already in local
+    const localIds = new Set(localProducts.map(p => String(p.id)));
+    const merged = [
+      ...localProducts,
+      ...apiData.filter(p => !localIds.has(String(p.id)))
+    ];
+    setProducts(merged);
+  } catch (error) {
+    console.error('Failed to load products:', error);
+  }
+  setLoading(false);
+};
 
   const addToCart = (product, quantity = 1) => {
     setCart(prev => {
@@ -150,6 +172,8 @@ function App() {
       return [...prev, { ...product, quantity }];
     });
   };
+
+  
 
   const removeFromCart = (productId) => {
     setCart(prev => prev.filter(item => item.id !== productId));
@@ -173,18 +197,19 @@ function App() {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
-  const contextValue = {
-    user,
-    cart, addToCart, removeFromCart, updateCartQuantity, clearCart, getTotalPrice,
-    products, setProducts, loadProducts,
-    loading, setLoading,
-    searchTerm, setSearchTerm,
-    API, 
-  };
+ const contextValue = {
+  user,
+  cart, addToCart, removeFromCart, updateCartQuantity, clearCart, getTotalPrice,
+  wishlist, addToWishlist, isWishlisted,
+  products, setProducts, loadProducts,
+  loading, setLoading,
+  searchTerm, setSearchTerm,
+  API,
+};
 
   return (
     <AppContext.Provider value={contextValue}>
-      <div className="min-h-screen bg-gray-900 text-white">
+      <div className="min-h-screen bg-black text-white">
         <Header />
         <main className="pb-20">
           <Routes>
@@ -196,6 +221,8 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/wishlist" element={<WishlistPage />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
             <Route 
               path="/admin" 
               element={

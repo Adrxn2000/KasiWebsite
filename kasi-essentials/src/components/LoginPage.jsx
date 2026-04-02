@@ -129,6 +129,20 @@ function LoginPage() {
               className="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:border-orange-500 focus:outline-none"
             />
           </div>
+          
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="mr-2 w-4 h-4 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500"
+            />
+            <label htmlFor="rememberMe" className="text-gray-300">
+              Remember my credentials
+            </label>
+          </div>
+          
           <button
             type="submit"
             disabled={isLoading}

@@ -13,23 +13,20 @@ function AdminDashboard() {
     setEditingProduct(product);
   };
 
-  const handleDelete = async ( productId) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        // Delete from localStorage
-        const products = JSON.parse(localStorage.getItem('products') || '[]');
-        const updatedProducts = products.filter(p => p.id !== productId);
-        localStorage.setItem('products', JSON.stringify(updatedProducts));
-        
-        // If you have an API, uncomment this line:
-        // await API.deleteProduct(productId);
-        
-        loadProducts(); // Refresh product list
-      } catch (error) {
-        alert('Failed to delete product: ' + error.message);
-      }
+const handleDelete = async (productId) => {
+  if (window.confirm('Are you sure you want to delete this product?')) {
+    try {
+      const stored = JSON.parse(localStorage.getItem('products') || '[]');
+      const updated = stored.filter(p => String(p.id) !== String(productId));
+      localStorage.setItem('products', JSON.stringify(updated));
+      await API.deleteProduct(productId);
+      loadProducts();
+    } catch (error) {
+      console.error('Delete error:', error);
+      loadProducts();
     }
-  };
+  }
+};
 
   if (user?.role !== 'admin') {
     return (
